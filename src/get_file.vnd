@@ -1,0 +1,21 @@
+import fstream
+import string
+
+
+mut fn GetFile(str path)
+{
+
+mut str line="";
+mut str ret="";
+*||
+std::ifstream in{path, std::ios::binary};
+
+while(std::getline(in,line))
+{
+    ret+=line;
+    line="";
+}
+
+return ret; 
+||*
+}

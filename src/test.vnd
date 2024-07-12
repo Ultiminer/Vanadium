@@ -1,0 +1,18 @@
+/*
+---- Fizz Buzz ----
+*/
+import input.vnd
+
+
+fn start()
+{
+   i32 num=str_to_int(input("Give me a number:"));
+   mut str ret="";
+   if(num%5==0)ret+="Fizz";
+   if(num%7==0)ret+="Buzz";
+    	
+    print(ret);
+}
+
+
+

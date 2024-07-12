@@ -1,0 +1,14 @@
+import string
+import iostream
+
+
+mut fn input(str text)
+{
+    mut str ret="";
+    print(text);
+    ||*
+    std::getline(std::cin,ret);
+    *||
+
+    return ret;
+}
