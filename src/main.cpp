@@ -10,8 +10,6 @@ int main(int argc, char**argv)
     assert(pathArg.find(".vnd")!=std::string::npos,"compiler only takes .vnd files");
     parse(pathArg.c_str());
     
-    system("g++ out.cpp -o out.exe");
-    system("out.exe");
 
     return 0;
 }

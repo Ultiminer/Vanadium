@@ -8,6 +8,14 @@
 #include <unordered_map>
 #include "text_methods.h"
 
+
+template<typename T>
+inline bool contains(const std::vector<T>& vec, const T& item)noexcept
+{
+    for(auto& el:vec)if(el==item)return true;
+    return false; 
+}
+
 enum class TokenType{
 NONE, 
 LINT, 
@@ -60,8 +68,11 @@ STR_TO_FLOAT,
 INT_TO_FLOAT,
 INT_TO_STR,
 FLOAT_TO_INT,
-FLOAT_TO_STR
-
+FLOAT_TO_STR,
+STRUCT,
+IFSTREAM,
+OFSTERAM,
+GETLINE
 };
 inline std::unordered_map<std::string,TokenType> trivialTokens={
 {"i64",TokenType::DEF_INT64},{"i32",TokenType::DEF_INT32},{"i16",TokenType::DEF_INT16},{"i8",TokenType::DEF_INT8},
@@ -78,6 +89,7 @@ inline std::unordered_map<std::string,TokenType> trivialTokens={
 {"str_to_int",TokenType::STR_TO_INT},{"str_to_float",TokenType::STR_TO_FLOAT},
 {"float_to_int",TokenType::FLOAT_TO_INT},{"int_to_float",TokenType::INT_TO_FLOAT},
 {"float_to_str",TokenType::FLOAT_TO_STR},{"int_to_str",TokenType::INT_TO_STR}
+,{"struct",TokenType::STRUCT},{"inFile",TokenType::IFSTREAM},{"outFile",TokenType::OFSTERAM},{"get_line",TokenType::GETLINE}
 };
 struct Token{
 TokenType t; 
@@ -156,6 +168,8 @@ inline std::string TokenStr(const TokenType& tk)noexcept
         case TokenType::SMALLER_OPERATOR: return "<";
         case TokenType::NOT_OPERATOR: return "<";
         case TokenType::MODULO_OPERATOR: return "%";
+        default: 
+        return "";
     }
 
     return "";
@@ -204,12 +218,12 @@ struct StateJob{
 bool add_noexcept;
 bool copy;
 };
-inline CCode parse(const char* path)noexcept
+inline CCode parse(const std::string& path)noexcept
 {
-    const TokenList& tlist=tokenize(path);
-    std::string cProgram="#include<iostream>\n#include<string>\n";
+    const TokenList& tlist=tokenize(path.c_str());
+    std::string cProgram="#include<iostream>\n#include<string>\n#include<fstream>\n using namespace std;\n ";
     std::string outVal="";
-
+    std::vector<std::string> structKeys; 
     StateJob job{0};
     for(size_t i=0; i< tlist.size();++i)
     {
@@ -289,6 +303,18 @@ inline CCode parse(const char* path)noexcept
             if(job.copy){job.copy=false;break;}
             if(job.add_noexcept)cProgram+="& ";
             break; 
+            case TokenType::OFSTERAM: 
+            cProgram+= get_token_var_modifier(tlist,i);
+            cProgram+="std::ofstream "; 
+            if(job.copy){job.copy=false;break;}
+            if(job.add_noexcept)cProgram+="& ";
+            break; 
+            case TokenType::IFSTREAM: 
+            cProgram+= get_token_var_modifier(tlist,i);
+            cProgram+="std::ifstream "; 
+            if(job.copy){job.copy=false;break;}
+            if(job.add_noexcept)cProgram+="& ";
+            break; 
             case TokenType::ASSIGN_OPERATOR: 
             cProgram+="="; 
             break; 
@@ -327,6 +353,9 @@ inline CCode parse(const char* path)noexcept
             break; 
             case TokenType::SEMICOLON:
             cProgram+=";"; 
+            break; 
+            case TokenType::GETLINE:
+            cProgram+="std::getline"; 
             break; 
             case TokenType::STDOUT: 
             outVal="";
@@ -367,7 +396,9 @@ inline CCode parse(const char* path)noexcept
             i++;
             if(tlist.at(i).value.find(".vnd") != std::string::npos)
             {
+                cProgram+="#ifndef "+tlist.at(i).value+"\n#define "+tlist.at(i).value+" "+tlist.at(i).value+"\n";
                 cProgram+=parse(tlist.at(i).value.c_str());
+                cProgram+="#endif";
                 break;  
             }
             cProgram+="#include \""+tlist.at(i).value+"\" ";
@@ -403,6 +434,10 @@ inline CCode parse(const char* path)noexcept
             assert(i+3<tlist.size(),"Return not well defined!");
             cProgram+="return ";
             break;
+            case TokenType::EXIT:
+            assert(i+3<tlist.size(),"Return not well defined!");
+            cProgram+="exit";
+            break;
             case TokenType::DEF_FUNCTION:
             if(tlist.at(i+1).t==TokenType::ENTRY_POINT){cProgram+="int ";break;}
 
@@ -413,14 +448,32 @@ inline CCode parse(const char* path)noexcept
             case TokenType::FOR:
             cProgram+="for";
             break; 
-             case TokenType::WHILE:
+            case TokenType::WHILE:
             cProgram+="while";
             break; 
-      
+            case TokenType::STRUCT:
+            cProgram+="struct ";
+            i++;
+            cProgram+=tlist.at(i).value;
+     
+            structKeys.push_back(tlist.at(i).value);
+            break; 
+            default:
+            break;
+        }
+        
+
+        if(i+1<tlist.size()&&contains(structKeys,tlist.at(i+1).value)){
+            i++;
+        cProgram+= get_token_var_modifier(tlist,i);
+        cProgram+=tlist.at(i).value+" ";
+        if(job.copy){job.copy=false;break;}
+        if(job.add_noexcept)cProgram+="& ";
+        
         }
     }
 
-    std::ofstream out{"out.cpp"};
+    std::ofstream out{path+".cpp"};
     out<<cProgram; 
     out.close();
     return cProgram; 
