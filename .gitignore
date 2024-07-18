@@ -1,5 +1,6 @@
 a.exe
 out.exe
 .vscode
-src/a.exe
-src/out.exe
+a.exe
+out.exe
+vanadium.exe

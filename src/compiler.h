@@ -72,7 +72,10 @@ FLOAT_TO_STR,
 STRUCT,
 IFSTREAM,
 OFSTERAM,
-GETLINE
+GETLINE,
+SWITCH,
+BREAK,
+CONTINUE
 };
 inline std::unordered_map<std::string,TokenType> trivialTokens={
 {"i64",TokenType::DEF_INT64},{"i32",TokenType::DEF_INT32},{"i16",TokenType::DEF_INT16},{"i8",TokenType::DEF_INT8},
@@ -90,6 +93,7 @@ inline std::unordered_map<std::string,TokenType> trivialTokens={
 {"float_to_int",TokenType::FLOAT_TO_INT},{"int_to_float",TokenType::INT_TO_FLOAT},
 {"float_to_str",TokenType::FLOAT_TO_STR},{"int_to_str",TokenType::INT_TO_STR}
 ,{"struct",TokenType::STRUCT},{"inFile",TokenType::IFSTREAM},{"outFile",TokenType::OFSTERAM},{"get_line",TokenType::GETLINE}
+,{"switch",TokenType::SWITCH},{"break",TokenType::BREAK},{"continue",TokenType::CONTINUE}
 };
 struct Token{
 TokenType t; 
@@ -450,6 +454,15 @@ inline CCode parse(const std::string& path)noexcept
             break; 
             case TokenType::WHILE:
             cProgram+="while";
+            break; 
+            case TokenType::SWITCH:
+            cProgram+="switch";
+            break; 
+            case TokenType::BREAK:
+            cProgram+="break";
+            break; 
+            case TokenType::CONTINUE:
+            cProgram+="continue";
             break; 
             case TokenType::STRUCT:
             cProgram+="struct ";
