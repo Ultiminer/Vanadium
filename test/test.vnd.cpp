@@ -1,43 +1,35 @@
 #include<iostream>
 #include<string>
 #include<fstream>
-using namespace std;
- 
-struct Test{
+ using namespace std;
+ /*
+Linear Algebra for vanadium HAHAHAHAHA
+*/
+
+inline constexpr float PI=3.141f;
+
+struct Vec2D{
 float x;
 float y;
 };
 
-
-inline void fibonacci(const unsigned long int & a,const unsigned long int & b,const unsigned long int N)noexcept
+inline constexpr const Vec2D add(const Vec2D & a,const Vec2D & b)noexcept
 {
-std::cout<<(a)<<std::endl<<std::flush;
-
-if(N>0)fibonacci(b,a+b,N-1);
+return {a.x+b.x,a.y+b.y};
 }
-
-inline constexpr auto dot_prod(const Test & test)noexcept
+inline constexpr const Vec2D sub(const Vec2D & a,const Vec2D & b)noexcept
 {
-return test.x*test.y;
+return {a.x-b.x,a.y-b.y};
 }
-inline auto read(const std::string & path)noexcept
+inline constexpr const Vec2D prod(const Vec2D & a,const Vec2D & b)noexcept
 {
-std::string data="";
-std::ifstream in{path,ios::binary};
-std::string line="";
-while(std::getline(in,line))
-{
-data+=line;
+return {a.x*b.x,a.y*b.y};
 }
-
-return line;
-}
-
-
-int main()
+inline constexpr const Vec2D div(const Vec2D & a,const Vec2D & b)noexcept
 {
-Test test={5,5};
-test.x=10;
-fibonacci(0,1,20);
-return 0;
+return {a.x/b.x,a.y/b.y};
+}
+inline constexpr const float dot(const Vec2D & a,const Vec2D & b)noexcept
+{
+return a.x*b.x+a.y*b.y;
 }

@@ -1,38 +1,31 @@
+/*
+Linear Algebra for vanadium HAHAHAHAHA
+*/
 
-struct Test{
+CONST f32 PI=3.141f; 
+
+struct Vec2D{
 mut f32 x; 
 mut f32 y; 
 };
 
-
-mut fn void fibonacci(u32 a, u32 b, copy u32 N)
+fn Vec2D add(Vec2D a, Vec2D b)
 {
-    print(a);
-    if(N>0)fibonacci(b,a+b,N-1);
+    return {a.x+b.x,a.y+b.y};
 }
-
-fn dot_prod(Test test)
+fn Vec2D sub(Vec2D a, Vec2D b)
 {
-    return test.x*test.y;
+    return {a.x-b.x,a.y-b.y};
 }
-mut fn read(str path)
+fn Vec2D prod(Vec2D a, Vec2D b)
 {
-    mut str data="";
-    mut inFile in{path,ios::binary};
-    mut str line="";
-    while(get_line(in, line))
-    {
-        data+=line; 
-    }
-
-    return line; 
+    return {a.x*b.x,a.y*b.y};
 }
-
-
-fn start()
+fn Vec2D div(Vec2D a, Vec2D b)
 {
-    mut Test test={5,5}; 
-    test.x=10; 
-    fibonacci(0,1,20);
-    return 0;   
+    return {a.x/b.x,a.y/b.y};
+}
+fn f32 dot(Vec2D a, Vec2D b)
+{
+    return a.x*b.x+a.y*b.y;
 }

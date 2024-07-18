@@ -225,10 +225,15 @@ bool copy;
 inline CCode parse(const std::string& path)noexcept
 {
     const TokenList& tlist=tokenize(path.c_str());
-    std::string cProgram="#include<iostream>\n#include<string>\n#include<fstream>\n using namespace std;\n ";
+    std::string cProgram="#include<iostream>\n#include<string>\n#include<cstdint>\n#include<fstream>\nusing namespace std;\n ";
     std::string outVal="";
     std::vector<std::string> structKeys; 
     StateJob job{0};
+
+    #define __TYPE_KIND_EXPANSION(str) cProgram+= get_token_var_modifier(tlist,i);cProgram+=str;\
+    if(job.copy){job.copy=false;break;}if(job.add_noexcept&&tlist.at(i-1).t!=TokenType::DEF_FUNCTION)cProgram+="& ";
+
+
     for(size_t i=0; i< tlist.size();++i)
     {
         switch(tlist.at(i).t)
@@ -243,81 +248,43 @@ inline CCode parse(const std::string& path)noexcept
             cProgram+="void "; 
             break; 
             case TokenType::DEF_FLOAT32: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="float "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("float ");
             break; 
             case TokenType::DEF_FLOAT64: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="double "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("double ");
             break; 
             case TokenType::DEF_INT32:
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="long int "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("int32_t ");
             break; 
             case TokenType::DEF_INT16: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="int "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("int16_t ");
             break; 
             case TokenType::DEF_INT64: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="long long int "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("int64_t ");
             break; 
             case TokenType::DEF_INT8: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="char "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("int8_t ");
             break; 
             case TokenType::DEF_UINT32: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="unsigned long int "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("uint32_t ");
             break; 
             case TokenType::DEF_UINT16: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="unsigned int "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("uint16_t ");
             break; 
             case TokenType::DEF_UINT64: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="unsigned long long int "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("uint64_t ");
             break; 
             case TokenType::DEF_UINT8: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="unsigned char "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("uint8_t ");
             break;
             case TokenType::DEF_STR: 
-            cProgram+=get_token_var_modifier(tlist,i)+"std::string "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("std::string ");
             break; 
             case TokenType::OFSTERAM: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="std::ofstream "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("std::ofstream ");
             break; 
             case TokenType::IFSTREAM: 
-            cProgram+= get_token_var_modifier(tlist,i);
-            cProgram+="std::ifstream "; 
-            if(job.copy){job.copy=false;break;}
-            if(job.add_noexcept)cProgram+="& ";
+            __TYPE_KIND_EXPANSION("std::ifstream ");
             break; 
             case TokenType::ASSIGN_OPERATOR: 
             cProgram+="="; 
@@ -478,11 +445,7 @@ inline CCode parse(const std::string& path)noexcept
 
         if(i+1<tlist.size()&&contains(structKeys,tlist.at(i+1).value)){
             i++;
-        cProgram+= get_token_var_modifier(tlist,i);
-        cProgram+=tlist.at(i).value+" ";
-        if(job.copy){job.copy=false;break;}
-        if(job.add_noexcept)cProgram+="& ";
-        
+        __TYPE_KIND_EXPANSION(tlist.at(i).value+" ");
         }
     }
 
