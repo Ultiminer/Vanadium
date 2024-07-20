@@ -12,5 +12,5 @@ Basically C++ with a bit more convenient Syntax
 * to remove constexpr add mut:  mut fn i32 add(i32 x, i32 y){return x+y;} -> inline const i32 add(const i32& x, const i32& y)noexcept{return x+y;}
 * if you emit type information, functions will try to infer the return type: fn fun() -> inline constexpr auto fun()
 * you can use assert per default, if assert(A==B) is false, then the program will exit and "assert failure with A==B" will be print to the console
-* if you wanna write pure C++ code and are unsure how the transpiler might change it, you can use ""||*"", ""*||"" to mark pure C++. "VANADIUM_CODE ||* CPP_CODE *|| VANADIUM_CODE"
+* if you wanna write pure C++ code and are unsure how the transpiler might change it, you can use ""*||"", ""||*"" to mark pure C++. "VANADIUM_CODE ||* CPP_CODE *|| VANADIUM_CODE"
  
